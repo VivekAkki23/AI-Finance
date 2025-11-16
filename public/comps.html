@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Comparable Company Analysis (Comps)</title>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+      color: #1e293b;
+      margin: 0;
+      padding: 40px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #1e3a8a;
+    }
+
+    .card {
+      background: #f9fafb;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 25px;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 15px;
+    }
+
+    th, td {
+      border: 1px solid #cbd5e1;
+      text-align: center;
+      padding: 8px;
+    }
+
+    th {
+      background: #e2e8f0;
+      font-weight: 600;
+    }
+
+    input[type="text"], input[type="number"] {
+      width: 90%;
+      padding: 6px 8px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 0.95rem;
+    }
+
+    .btn {
+      background: linear-gradient(90deg, #2563eb, #1d4ed8);
+      color: white;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      background: linear-gradient(90deg, #1e40af, #1d4ed8);
+      transform: scale(1.05);
+    }
+
+    .form-group {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      gap: 15px;
+    }
+
+    .form-group label {
+      flex: 1;
+      font-weight: 500;
+      text-align: right;
+    }
+
+    .form-group input {
+      flex: 2;
+    }
+
+    #comps-result {
+      margin-top: 20px;
+      background: #eff6ff;
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid #bfdbfe;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>📊 Comparable Company Analysis (Comps)</h1>
+
+    <div class="card">
+      <p>Compare similar companies using valuation multiples like <b>P/E</b> and <b>EV/EBITDA</b> to estimate your company’s fair value.</p>
+
+      <h3>Enter Comparable Company Data</h3>
+      <table id="comps-table">
+        <tr>
+          <th>Company</th>
+          <th>Share Price (₹)</th>
+          <th>EPS (₹)</th>
+          <th>P/E Ratio</th>
+          <th>EV (₹ Cr)</th>
+          <th>EBITDA (₹ Cr)</th>
+          <th>EV/EBITDA</th>
+        </tr>
+        <tr>
+          <td><input type="text" placeholder="e.g., Infosys"></td>
+          <td><input type="number" step="0.01"></td>
+          <td><input type="number" step="0.01"></td>
+          <td><input type="number" step="0.01"></td>
+          <td><input type="number" step="0.01"></td>
+          <td><input type="number" step="0.01"></td>
+          <td><input type="number" step="0.01"></td>
+        </tr>
+      </table>
+
+      <button class="btn" id="add-row">➕ Add Another Company</button>
+
+      <h3 style="margin-top:25px;">Your Company’s Data</h3>
+
+      <div class="form-group">
+        <label>Company Name:</label>
+        <input type="text" id="target-name" placeholder="Enter your company name" />
+      </div>
+
+      <div class="form-group">
+        <label>EPS (₹):</label>
+        <input type="number" id="target-eps" placeholder="Enter EPS" />
+      </div>
+
+      <div class="form-group">
+        <label>EBITDA (₹ Cr):</label>
+        <input type="number" id="target-ebitda" placeholder="Enter EBITDA" />
+      </div>
+
+      <div class="form-group">
+        <label>Total Shares Outstanding (Cr):</label>
+        <input type="number" id="target-shares" placeholder="Enter number of shares" />
+      </div>
+
+      <button class="btn" id="calc-comps">⚙️ Calculate Valuation</button>
+
+      <div id="comps-result"></div>
+    </div>
+  </div>
+
+  <script>
+    // Add row dynamically
+    document.getElementById("add-row").addEventListener("click", () => {
+      const table = document.getElementById("comps-table");
+      const row = table.insertRow(-1);
+      for (let i = 0; i < 7; i++) {
+        const cell = row.insertCell(i);
+        cell.innerHTML = `<input type="text" step="0.01" />`;
+      }
+    });
+
+    // Calculate valuation
+    document.getElementById("calc-comps").addEventListener("click", () => {
+      const rows = Array.from(document.querySelectorAll("#comps-table tr")).slice(1);
+      let peList = [], evEbitdaList = [];
+
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("input");
+        const price = parseFloat(cells[1].value);
+        const eps = parseFloat(cells[2].value);
+        const pe = price && eps ? price / eps : parseFloat(cells[3].value);
+        if (!isNaN(pe)) peList.push(pe);
+
+        const ev = parseFloat(cells[4].value);
+        const ebitda = parseFloat(cells[5].value);
+        const evEbitda = ev && ebitda ? ev / ebitda : parseFloat(cells[6].value);
+        if (!isNaN(evEbitda)) evEbitdaList.push(evEbitda);
+      });
+
+      if (peList.length === 0 || evEbitdaList.length === 0) {
+        alert("⚠️ Please enter valid comparable data first!");
+        return;
+      }
+
+      const avgPE = peList.reduce((a, b) => a + b, 0) / peList.length;
+      const avgEVEBITDA = evEbitdaList.reduce((a, b) => a + b, 0) / evEbitdaList.length;
+
+      const eps = parseFloat(document.getElementById("target-eps").value);
+      const ebitda = parseFloat(document.getElementById("target-ebitda").value);
+      const shares = parseFloat(document.getElementById("target-shares").value);
+      const company = document.getElementById("target-name").value || "Your Company";
+
+      if (!eps || !ebitda || !shares) {
+        alert("⚠️ Please enter your company’s EPS, EBITDA, and Shares Outstanding.");
+        return;
+      }
+
+      const equityValue = avgPE * eps * shares;
+      const enterpriseValue = avgEVEBITDA * ebitda;
+      const impliedPrice = equityValue / shares;
+
+      document.getElementById("comps-result").innerHTML = `
+        <h3>📈 Valuation Summary for ${company}</h3>
+        <p><b>Average P/E of Peers:</b> ${avgPE.toFixed(2)}x</p>
+        <p><b>Average EV/EBITDA of Peers:</b> ${avgEVEBITDA.toFixed(2)}x</p>
+        <p><b>Implied Equity Value:</b> ₹${equityValue.toLocaleString("en-IN")}</p>
+        <p><b>Implied Enterprise Value:</b> ₹${enterpriseValue.toLocaleString("en-IN")}</p>
+        <p><b>Implied Share Price:</b> ₹${impliedPrice.toFixed(2)}</p>
+      `;
+    });
+  </script>
+</body>
+</html>

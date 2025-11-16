@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Overview | IB Modeler</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      background-color: #000;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    /* --- Netflix-style Hero Section --- */
+    .hero {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      text-align: center;
+      color: #fff;
+      overflow: hidden;
+      padding-bottom: 60px;
+    }
+
+    #bg-video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      filter: brightness(60%);
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 1;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      animation: fadeIn 1.5s ease-in-out;
+      max-width: 800px;
+      padding: 20px;
+    }
+
+    .hero h1 {
+      font-size: 56px;
+      color: #e50914;
+      margin-bottom: 20px;
+    }
+
+    .hero p {
+      font-size: 20px;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    .cta-btn {
+      padding: 14px 28px;
+      font-size: 18px;
+      background-color: #e50914;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.3s;
+      text-decoration: none;
+      font-weight: 600;
+      margin: 5px;
+    }
+
+    .cta-btn:hover {
+      background-color: #b20710;
+      transform: scale(1.05);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* --- Overview Section --- */
+    #overview-content {
+      position: relative;
+      z-index: 2;
+      background: #141414;
+      padding: 60px 10%;
+      margin-top: -60px;
+    }
+
+    #overview-content h1 {
+      color: #e50914;
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+
+    .section {
+      background: #1c1c1c;
+      border-radius: 12px;
+      padding: 22px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .section h2 {
+      color: #e50914;
+    }
+
+    .section p, .section ul, .section li {
+      color: #ddd;
+      line-height: 1.6;
+    }
+
+    a.back {
+      display: inline-block;
+      margin-top: 25px;
+      padding: 10px 16px;
+      background: #e50914;
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    a.back:hover {
+      background: #b20710;
+      transform: scale(1.05);
+    }
+
+    /* --- Developer Info Section --- */
+    #developer-info {
+      display: none;
+      background: #1c1c1c;
+      border-radius: 12px;
+      padding: 25px;
+      margin: 50px 10%;
+      text-align: center;
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+    }
+
+    #developer-info.visible {
+      display: block;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    #developer-info h2 {
+      color: #e50914;
+      margin-bottom: 15px;
+    }
+
+    #developer-info p {
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <video autoplay muted loop playsinline id="bg-video">
+      <source src="https://cdn.coverr.co/videos/coverr-stock-exchange-ticker-1139/1080p.mp4" type="video/mp4">
+    </video>
+
+    <div class="overlay"></div>
+    <div class="hero-content">
+      <h1>IB Modeler</h1>
+      <p>The Netflix of Financial Modeling — Learn, Analyze, and Master Valuation like a Pro.</p>
+      <a href="#overview-content" class="cta-btn">Get Started</a>
+      <button class="cta-btn" onclick="showDevelopers()">Learn More</button>
+    </div>
+  </section>
+  
+  <!-- Spacer -->
+  <div style="height: 80px; background: transparent;"></div>
+
+  <!-- Overview Section -->
+  <div id="overview-content">
+    <h1>Overview</h1>
+
+    <div class="section">
+      <h2>What is IB Modeler?</h2>
+      <p>
+        <strong>IB Modeler</strong> is a financial analysis and valuation toolkit designed to help analysts,
+        students, and professionals work like an Investment Banker.  
+        It simplifies complex financial modeling by providing tools for:
+      </p>
+      <ul>
+        <li>Business Valuation</li>
+        <li>Equity & Market Analysis</li>
+        <li>Comparable Company Analysis (Comps)</li>
+        <li>M&A and Deal Modeling</li>
+      </ul>
+      <p>
+        Whether you're preparing pitch decks, evaluating investments, or studying finance —
+        IB Modeler helps you make data-driven decisions with clarity.
+      </p>
+    </div>
+
+    <div class="section">
+      <h2>Key Concepts in Finance</h2>
+      <ul>
+        <li><strong>Valuation:</strong> Determining what a company is worth using DCF, Net Income, Assets, etc.</li>
+        <li><strong>Discounted Cash Flow (DCF):</strong> Predicting future cash and calculating present value.</li>
+        <li><strong>Multiples & Comps:</strong> Comparing similar companies using ratios like P/E, EV/EBITDA.</li>
+        <li><strong>Market Sentiment:</strong> The general mood of investors (Bullish vs Bearish).</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>Your Dashboard Insights</h2>
+      <ul>
+        <li><strong>Portfolio Growth:</strong> +12% this quarter 🎯</li>
+        <li><strong>Market Trend:</strong> Currently Bullish 📈</li>
+        <li><strong>Active Deals:</strong> 3 models in progress 💼</li>
+      </ul>
+    </div>
+
+    <a class="back" href="dashboard.html">⬅ Back to Dashboard</a>
+  </div>
+
+  <!-- Developer Info Section (hidden initially) -->
+  <div id="developer-info">
+    <h2>Developed By</h2>
+    <p><strong>Mr. Vikas</strong> – <a href="mailto:vikas@gmail.com" style="color:#38bdf8;">vikas@gmail.com</a></p>
+    <p><strong>Mr. Vivek</strong> – <a href="mailto:vivek@gmail.com" style="color:#38bdf8;">vivek@gmail.com</a></p>
+  </div>
+
+  <script>
+    const sections = document.querySelectorAll('.section');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+      });
+    }, { threshold: 0.2 });
+    sections.forEach(sec => observer.observe(sec));
+
+    // Show developer info on Learn More click
+    function showDevelopers() {
+      document.getElementById('developer-info').classList.add('visible');
+      document.getElementById('developer-info').scrollIntoView({ behavior: 'smooth' });
+    }
+  </script>
+
+</body>
+</html>

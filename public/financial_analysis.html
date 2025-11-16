@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Financial Analysis - Input Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: #f9fafb;
+      padding: 40px;
+      color: #1e293b;
+    }
+    h1 { text-align: center; margin-bottom: 25px; }
+    .input-section, .charts, .analysis-box { 
+      background: #fff; 
+      padding: 20px; 
+      border-radius: 12px; 
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+    label { font-weight: 500; display: block; margin: 8px 0 4px; }
+    input {
+      width: 100%; padding: 8px; margin-bottom: 10px;
+      border: 1px solid #cbd5e1; border-radius: 6px;
+    }
+    button {
+      background: #2563eb; color: white; padding: 10px 18px;
+      border: none; border-radius: 8px; cursor: pointer;
+    }
+    button:hover { background: #1e40af; }
+    canvas { margin-top: 25px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); gap: 25px; }
+    pre {
+      background: #f1f5f9;
+      padding: 15px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <h1>📊 Interactive Financial Analysis Dashboard</h1>
+
+  <div class="input-section">
+    <h3>Enter Financial Data (comma-separated values)</h3>
+    <label>Revenue Growth (in ₹ Cr):</label>
+    <input id="revenueInput" placeholder="e.g. 0.6, 0.8, 1.0, 1.25">
+    <label>Profit Margin (%):</label>
+    <input id="profitInput" placeholder="e.g. 15, 18, 25, 30">
+    <label>Expense Breakdown (%):</label>
+    <input id="expenseInput" placeholder="e.g. 45, 25, 10, 15, 5">
+    <label>Cash Flow - Operating (₹ L):</label>
+    <input id="cfOperating" placeholder="e.g. 20, 25, 22, 28">
+    <label>Cash Flow - Investing (₹ L):</label>
+    <input id="cfInvesting" placeholder="e.g. -8, -10, -7, -9">
+    <label>Cash Flow - Financing (₹ L):</label>
+    <input id="cfFinancing" placeholder="e.g. 5, 4, 6, 3">
+    <button onclick="generateCharts()">Generate Charts</button>
+  </div>
+
+  <div class="charts grid">
+    <div>
+      <h3>Revenue Growth</h3>
+      <canvas id="revenueChart"></canvas>
+    </div>
+    <div>
+      <h3>Profit Margin Trend</h3>
+      <canvas id="profitChart"></canvas>
+    </div>
+    <div>
+      <h3>Expense Breakdown</h3>
+      <canvas id="expenseChart"></canvas>
+    </div>
+    <div>
+      <h3>Cash Flow</h3>
+      <canvas id="cashflowChart"></canvas>
+    </div>
+  </div>
+
+  <div class="analysis-box">
+    <h3>🧠 Financial Insights</h3>
+    <pre id="analysisOutput">Your analysis will appear here after generating charts.</pre>
+  </div>
+
+  <script>
+    let charts = {};
+
+    function parseInput(id) {
+      return document.getElementById(id).value.split(',')
+        .map(v => parseFloat(v.trim())).filter(v => !isNaN(v));
+    }
+
+    function generateCharts() {
+      const revenueGrowth = parseInput('revenueInput');
+      const profitMargin = parseInput('profitInput');
+      const expenseBreakdown = parseInput('expenseInput');
+      const cfOperating = parseInput('cfOperating');
+      const cfInvesting = parseInput('cfInvesting');
+      const cfFinancing = parseInput('cfFinancing');
+
+      const labels = Array.from({length: Math.max(revenueGrowth.length, profitMargin.length)}, (_, i) => `Year ${i+1}`);
+      const qlabels = ['Q1', 'Q2', 'Q3', 'Q4'];
+
+      // destroy old charts
+      Object.values(charts).forEach(ch => ch.destroy());
+
+      charts.revenue = new Chart(document.getElementById('revenueChart'), {
+        type: 'line',
+        data: { labels, datasets: [{ label: 'Revenue (₹ Cr)', data: revenueGrowth, borderColor: '#2563eb', fill: true, tension: 0.4 }]},
+        options: { scales: { y: { beginAtZero: true } } }
+      });
+
+      charts.profit = new Chart(document.getElementById('profitChart'), {
+        type: 'bar',
+        data: { labels, datasets: [{ label: 'Profit Margin (%)', data: profitMargin, backgroundColor: '#22c55e' }]},
+        options: { scales: { y: { beginAtZero: true } } }
+      });
+
+      charts.expense = new Chart(document.getElementById('expenseChart'), {
+        type: 'doughnut',
+        data: { labels: ['Salaries','R&D','Marketing','Operations','Misc.'],
+          datasets: [{ data: expenseBreakdown, backgroundColor: ['#2563eb','#38bdf8','#facc15','#22c55e','#f97316'] }]},
+        options: { plugins: { legend: { position: 'bottom' } } }
+      });
+
+      charts.cashflow = new Chart(document.getElementById('cashflowChart'), {
+        type: 'bar',
+        data: { labels: qlabels,
+          datasets: [
+            { label: 'Operating CF (₹ L)', data: cfOperating, backgroundColor: '#2563eb' },
+            { label: 'Investing CF (₹ L)', data: cfInvesting, backgroundColor: '#f97316' },
+            { label: 'Financing CF (₹ L)', data: cfFinancing, backgroundColor: '#22c55e' }
+          ]
+        },
+        options: { scales: { y: { beginAtZero: true } }, plugins: { legend: { position: 'bottom' } } }
+      });
+
+      // run analysis
+      const analysis = analyzeData(
+        ['Company A', 'Company B', 'Company C', 'Company D'], 
+        revenueGrowth, 
+        profitMargin, 
+        [100, 120, 80, 150] // Example valuations
+      );
+      document.getElementById("analysisOutput").textContent = analysis;
+    }
+
+    // --- your added function ---
+    function analyzeData(names, revenues, profits, valuations) {
+      let report = "";
+      for (let i = 0; i < names.length; i++) {
+        if (!names[i]) continue;
+        if (profits[i] <= 0) {
+          report += `⚠️ ${names[i]} is losing money.\n`;
+        } else if (profits[i] / revenues[i] > 0.2) {
+          report += `✅ ${names[i]} shows strong profitability.\n`;
+        } else {
+          report += `📊 ${names[i]} is stable but could improve margins.\n`;
+        }
+
+        if (valuations[i] < revenues[i]) {
+          report += `💰 ${names[i]}'s valuation looks undervalued.\n\n`;
+        } else {
+          report += `🚀 ${names[i]} has high investor confidence.\n\n`;
+        }
+      }
+      return report;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Finance Dashboard - Netflix Theme</title>
+  <style>
+    /* Netflix Theme */
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      display: flex;
+      height: 100vh;
+      background: #141414;
+      color: #e5e5e5;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background: #000;
+      color: #e5e5e5;
+      display: flex;
+      flex-direction: column;
+      padding: 25px;
+      box-shadow: 4px 0 15px rgba(0, 0, 0, 0.7);
+    }
+
+    .sidebar h2 {
+      margin-bottom: 40px;
+      text-align: center;
+      color: #e50914;
+      font-weight: 700;
+      letter-spacing: 1px;
+      font-size: 1.5rem;
+    }
+
+    .sidebar a {
+      color: #b3b3b3;
+      text-decoration: none;
+      padding: 12px 15px;
+      border-radius: 6px;
+      margin: 5px 0;
+      display: block;
+      transition: all 0.25s ease;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .sidebar a:hover,
+    .sidebar a.active {
+      background: #e50914;
+      color: #fff;
+      transform: translateX(6px);
+    }
+
+    /* Main Content */
+    .main-content {
+      flex-grow: 1;
+      padding: 30px 40px;
+      background-color: #141414;
+      overflow-y: auto;
+      border-radius: 15px 0 0 15px;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6);
+      position: relative;
+    }
+
+    h1 {
+      color: #fff;
+      font-size: 2rem;
+      margin-bottom: 15px;
+      font-weight: 600;
+      border-left: 5px solid #e50914;
+      padding-left: 10px;
+    }
+
+    p {
+      color: #b3b3b3;
+      margin-bottom: 20px;
+    }
+
+    /* Section Animation */
+    .section {
+      display: none;
+      animation: fadeIn 0.35s ease-in-out;
+    }
+    .section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cards */
+    .card {
+      background: #1c1c1c;
+      padding: 22px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.01);
+      box-shadow: 0 8px 30px rgba(229, 9, 20, 0.18);
+    }
+
+    .card h3 {
+      color: #fff;
+      margin-bottom: 12px;
+    }
+
+    /* Buttons */
+    .btn {
+      background: #e50914;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform 0.15s ease;
+    }
+
+    .btn:hover {
+      transform: scale(1.04);
+    }
+
+    input[type="file"], input[type="number"], label {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+      color: #e5e5e5;
+    }
+
+    input[type="file"], input[type="number"] {
+      padding: 8px;
+      border: 1px solid #333;
+      border-radius: 6px;
+      background: #1c1c1c;
+    }
+
+    /* Result Box */
+    #result-area {
+      margin-top: 20px;
+      background: #1f1f1f;
+      padding: 18px;
+      border-radius: 12px;
+      border: 1px solid rgba(229,9,20,0.12);
+      box-shadow: 0 0 18px rgba(229, 9, 20, 0.06);
+    }
+
+    #result-area h3 {
+      color: #e50914;
+      margin-bottom: 8px;
+    }
+
+    /* Tool Cards */
+    .tool-card {
+      background: #1c1c1c;
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+      margin: 12px 0;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tool-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(229, 9, 20, 0.12);
+    }
+
+    .tool-card h2 {
+      color: #e50914;
+      margin-bottom: 8px;
+    }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+    }
+
+    /* --- Overview Hero with video --- */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      overflow: hidden;
+      background-color: #000; /* fallback */
+      display: flex;
+      align-items: center;
+      padding: 60px 6% 80px 8%;
+      margin-bottom: 40px;
+    }
+
+    /* Background video element */
+    #bg-video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      filter: brightness(0.45) contrast(1.05);
+      transform: scale(1.02);
+    }
+
+    /* overlay for readability */
+    .hero .overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.85) 10%, rgba(0,0,0,0.45) 50%, rgba(0,0,0,0.15) 80%);
+      z-index: 1;
+    }
+
+    .hero .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 980px;
+      color: #fff;
+    }
+
+    .hero h1 {
+      color: #fff;
+      font-weight: 800;
+      margin: 0 0 18px 0;
+      line-height: 1;
+      text-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      font-size: clamp(36px, 6.2vw, 84px);
+      letter-spacing: -1px;
+    }
+
+    .hero p {
+      margin: 0 0 28px 0;
+      color: #e6e6e6;
+      font-size: clamp(16px, 1.6vw, 22px);
+      max-width: 720px;
+      line-height: 1.5;
+      opacity: 0.95;
+    }
+
+    .hero .cta-row { display:flex; gap:16px; align-items:center; }
+
+    /* fade out state for hero when pressing Get Started */
+    .hero.fade-out {
+      opacity: 0;
+      transition: opacity 0.9s ease;
+      pointer-events: none;
+    }
+
+    /* sections fade-in while scrolling */
+    .section {
+      background: #1c1c1c;
+      border-radius: 12px;
+      padding: 22px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Small responsive tweaks */
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      body { flex-direction: column; }
+      .main-content { height: 100vh; border-radius: 0; padding: 20px; }
+      .hero { padding: 40px 4% 60px 4%; }
+      #bg-video { transform: none; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="sidebar">
+    <h2>AI Finance</h2>
+    <a class="nav-link" data-section="overview">Overview</a>
+    <a class="nav-link" data-section="financial-models">Financial Models</a>
+    <a class="nav-link" data-section="valuation-tools">Valuation Tools</a>
+    <a class="nav-link" data-section="analytics">📊 Analytics</a>
+    <a href="account2.html">Account</a>
+  </div>
+
+  <div class="main-content">
+    <!-- Overview -->
+    <!-- NOTE: removed external <a href="overview.html"> wrapper so overview stays in same tab -->
+    <!-- 🔥 Cinematic Overview Section (IB Modeler, local video background) -->
+    <div id="overview" class="section active hero" style="position: relative;">
+
+      <!-- Local video file - place your file at videos/finance-bg.mp4 -->
+      <video id="bg-video" autoplay muted loop playsinline>
+        <source src="videos/finance-bg.mp4" type="video/mp4">
+        <!-- fallback image if video isn't available -->
+        Your browser does not support the video tag.
+      </video>
+
+      <!-- Gradient overlay -->
+      <div class="overlay" aria-hidden="true"></div>
+
+      <!-- Top-left logo (your brand) -->
+      <div style="position: absolute; top: 22px; left: 28px; z-index: 3;">
+        <h2 style="color:#fff; font-size:32px; font-weight:800; letter-spacing:-1px; text-shadow:0 4px 14px rgba(0,0,0,0.7); margin:0;">
+          IB<span style="color:#e50914;">Modeler</span>
+        </h2>
+      </div>
+       
+      <style>
+  /* Prevent hero text overlap with top-left logo */
+  .hero-section {
+    padding-top: 135px; /* adjust: 100–140px depending on logo size */
+  }
+</style>
+
+
+      <!-- Top-right placeholders -->
+      <div style="position: absolute; top: 28px; right: 36px; z-index:3; display:flex; gap:12px; align-items:center;">
+        <div style="color:#ddd; font-weight:600; font-size:14px; opacity:0.9;">Welcome</div>
+        <button style="background:transparent; border:1px solid rgba(255,255,255,0.12); color:#fff; padding:8px 12px; border-radius:6px; font-weight:600;">
+          Profile
+        </button>
+      </div>
+
+      <!-- Hero content -->
+      <div class="hero-content" style="z-index:3;">
+      <h1 style="margin-top: 60px;">The AI-Powered Finance Experience</h1>
+
+
+        <p>Welcome to <strong>IB Modeler</strong> — your cinematic dashboard for professional-grade valuation, DCF automation, and financial analytics. Model smarter, present better, and learn faster.</p>
+
+        <!-- CTA buttons -->
+        <div class="cta-row">
+          <button id="overview-cta" class="btn" style="padding:16px 28px; font-size:18px; font-weight:800; border-radius:8px;">
+            Get Started
+          </button>
+
+          <button id="overview-learn" style="background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.06); padding: 14px 22px; font-size:16px; border-radius:8px;">
+            Learn More
+          </button>
+        </div>
+
+        <div style="margin-top:20px; color:#bdbdbd; font-size:14px;">
+          <span style="margin-right:16px;">📈 Portfolio: +12% (Q)</span>
+          <span style="margin-right:16px;">⚖ Active Deals: 3</span>
+          <span>🔔 Market: Bullish</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Original overview content section (will be scrolled to / revealed) -->
+    <div id="overview-content" class="content-section">
+     
+
+      <div class="section">
+        <h2>What is IB Modeler?</h2>
+        <p>
+          <strong>IB Modeler</strong> is a financial analysis and valuation toolkit designed to help analysts,
+          students, and professionals work like an Investment Banker.  
+          It simplifies complex financial modeling by providing tools for:
+        </p>
+        <ul>
+          <li>Business Valuation</li>
+          <li>Equity & Market Analysis</li>
+          <li>Comparable Company Analysis (Comps)</li>
+          <li>M&A and Deal Modeling</li>
+        </ul>
+        <p>
+          Whether you're preparing pitch decks, evaluating investments, or studying finance —
+          IB Modeler helps you make data-driven decisions with clarity.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>Key Concepts in Finance</h2>
+        <ul>
+          <li><strong>Valuation:</strong> Determining what a company is worth using DCF, Net Income, Assets, etc.</li>
+          <li><strong>Discounted Cash Flow (DCF):</strong> Predicting future cash and calculating present value.</li>
+          <li><strong>Multiples & Comps:</strong> Comparing similar companies using ratios like P/E, EV/EBITDA.</li>
+          <li><strong>Market Sentiment:</strong> The general mood of investors (Bullish vs Bearish).</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>Your Dashboard Insights</h2>
+        <ul>
+          <li><strong>Portfolio Growth:</strong> +12% this quarter 🎯</li>
+          <li><strong>Market Trend:</strong> Currently Bullish 📈</li>
+          <li><strong>Active Deals:</strong> 3 models in progress 💼</li>
+        </ul>
+      </div>
+
+   <a class="back" href="dashboard.html">⬅ Back to Dashboard</a>
+
+<style>
+  .back {
+    position: absolute;
+    bottom: 40px;
+    left: 40px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+  }
+</style>
+
+
+    </div>
+
+    <!-- small tagline / meta (kept for layout parity) -->
+    <div style="margin-top:20px; color:#bdbdbd; font-size:14px; display:none;">
+      <span style="margin-right:16px;">📈 Portfolio: +12% (Q)</span>
+      <span style="margin-right:16px;">⚖ Active Deals: 3</span>
+      <span>🔔 Market: Bullish</span>
+    </div>
+
+    <!-- subtle bottom fade to content (kept) -->
+    <div style="position:absolute; bottom:0; left:0; right:0; height:120px; z-index:4; pointer-events:none; background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.95) 85%);"></div>
+
+    <!-- Financial Models -->
+    <div id="financial-models" class="section">
+      <h1>Financial Models</h1>
+      <p>Select a model to begin working with your data.</p>
+      <div class="card">
+        <h3>DCF Model</h3>
+        <button class="btn" id="open-dcf">Open DCF Model</button>
+      </div>
+      <div class="card">
+        <h3>Three-Statement Model</h3>
+        <button class="btn" id="open-three">Open 3-Statement Model</button>
+      </div>
+    </div>
+
+    <!-- DCF Model -->
+    <div id="dcf-model" class="section">
+      <h1>DCF Model</h1>
+      <div class="card">
+        <button class="btn" id="create-excel">Create Excel Document</button>
+        <button class="btn" id="upload-excel">Upload Excel Document</button>
+
+        <div id="upload-section" style="display:none; margin-top:15px;">
+          <input type="file" id="excel-file" accept=".xlsx" />
+          <button class="btn" id="process-excel">Process File</button>
+        </div>
+
+        <div id="result-area"></div>
+      </div>
+    </div>
+
+    <!-- Valuation Tools -->
+    <div id="valuation-tools" class="section">
+      <h1>Valuation Tools</h1>
+      <p>Choose from a variety of valuation models to analyze companies.</p>
+
+      <div class="tools-grid">
+        <div class="tool-card">
+          <h2>Comparable Company Analysis (Comps)</h2>
+          <p>Analyze similar companies using valuation multiples.</p>
+          <button class="btn" onclick="window.location.href='comps.html'">Open Tool</button>
+        </div>
+        <div class="tool-card">
+          <h2>Precedent Transaction Analysis</h2>
+          <p>Evaluate past M&A transactions for insights.</p>
+          <button class="btn" onclick="window.location.href='precedent.html'">Open Tool</button>
+        </div>
+        <div class="tool-card">
+          <h2>Leveraged Buyout (LBO) Model</h2>
+          <p>Estimate returns from leveraged acquisitions.</p>
+          <button class="btn" onclick="window.location.href='lbo.html'">Open Tool</button>
+        </div>
+        <div class="tool-card">
+          <h2>Sensitivity Analysis</h2>
+          <p>Test how variables affect valuation outcomes.</p>
+          <button class="btn" onclick="window.location.href='sensitivity.html'">Open Tool</button>
+        </div>
+        <div class="tool-card">
+          <h2>Dividend Discount Model (DDM)</h2>
+          <p>Value firms using dividend growth models.</p>
+          <button class="btn" onclick="window.location.href='ddm.html'">Open Tool</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analytics -->
+    <div id="analytics" class="section">
+      <h1>📊 Analytics</h1>
+      <div class="tools-grid">
+        <div class="tool-card">
+          <h2>Financial Analysis</h2>
+          <p>Analyze portfolios, ratios, and risk metrics with AI insights.</p>
+          <button class="btn" onclick="window.location.href='financial_analysis.html'">Open Tool</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Three-Statement Model -->
+    <div id="three-model" class="section">
+      <h1>Three-Statement Model</h1>
+      <div class="card">
+        <p>Build a dynamically linked Income Statement, Balance Sheet, and Cash Flow Statement.</p>
+        
+        <h3>Income Statement Inputs</h3>
+        <label>Revenue (₹):</label>
+        <input type="number" id="revenue" placeholder="Enter revenue" /><br><br>
+        <label>COGS (₹):</label>
+        <input type="number" id="cogs" placeholder="Enter cost of goods sold" /><br><br>
+        <label>Operating Expenses (₹):</label>
+        <input type="number" id="opex" placeholder="Enter operating expenses" /><br><br>
+        <label>Depreciation (₹):</label>
+        <input type="number" id="depr" placeholder="Enter depreciation" /><br><br>
+        <label>Interest Expense (₹):</label>
+        <input type="number" id="interest" placeholder="Enter interest expense" /><br><br>
+        <label>Tax Rate (%):</label>
+        <input type="number" id="taxrate" placeholder="Enter tax rate" value="30" /><br><br>
+
+        <button class="btn" id="calc-3stmt">Generate Model</button>
+        <div id="three-result" style="margin-top:20px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- XLSX library -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <script>
+    // Sidebar Navigation - unchanged behavior
+    const links = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('.section');
+    links.forEach(link => {
+      link.addEventListener('click', () => {
+        links.forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+        sections.forEach(section => section.classList.remove('active'));
+        const target = link.dataset.section;
+        const el = document.getElementById(target);
+        if (el) el.classList.add('active');
+      });
+    });
+
+    // DCF Navigation
+    document.getElementById('open-dcf')?.addEventListener('click', () => {
+      sections.forEach(section => section.classList.remove('active'));
+      document.getElementById('dcf-model').classList.add('active');
+    });
+
+    // Three-Statement Navigation
+    document.getElementById('open-three')?.addEventListener('click', () => {
+      sections.forEach(section => section.classList.remove('active'));
+      document.getElementById('three-model').classList.add('active');
+    });
+
+    // Excel Creation (keeps original fetch behavior)
+    document.getElementById('create-excel')?.addEventListener('click', () => {
+      fetch("/open-excel")
+        .then(res => {
+          if (res.ok) alert("✅ Excel opened successfully!");
+          else alert("⚠ Could not open Excel.");
+        })
+        .catch(err => alert("❌ Error: " + err));
+    });
+
+    // Upload Section toggler
+    document.getElementById('upload-excel')?.addEventListener('click', () => {
+      document.getElementById('upload-section').style.display = "block";
+    });
+
+    // Process Excel - restored full logic
+    document.getElementById('process-excel')?.addEventListener('click', () => {
+      const file = document.getElementById('excel-file')?.files[0];
+      if (!file) return alert("Please select an Excel file first!");
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+          let cashFlows = [];
+          rows.forEach((r, i) => {
+            // original logic: skip header (i>0) and take first column numbers
+            if (i > 0 && r[0] !== undefined && r[0] !== null && r[0] !== "" && !isNaN(r[0])) {
+              cashFlows.push(parseFloat(r[0]));
+            }
+          });
+
+          if (cashFlows.length === 0) {
+            document.getElementById('result-area').innerHTML = "<p>No valid data found in Excel.</p>";
+            return;
+          }
+
+          const discountRate = 0.1;
+          const initialInvestment = cashFlows[0];
+          // compute NPV (excluding initial investment from discounted inflows)
+          const npv = cashFlows.slice(1).reduce((acc, cf, i) => acc + cf / Math.pow(1 + discountRate, i + 1), 0) - initialInvestment;
+
+          const irr = calculateIRR(cashFlows);
+          const totalSum = cashFlows.reduce((a, b) => a + b, 0);
+          const roi = ((totalSum - initialInvestment) / Math.abs(initialInvestment)) * 100;
+          // guard against zero division for CAGR
+          let cagr = 0;
+          if (cashFlows.length > 1 && cashFlows[0] !== 0) {
+            cagr = Math.pow(Math.abs(cashFlows[cashFlows.length - 1]) / Math.abs(cashFlows[0]), 1 / (cashFlows.length - 1)) - 1;
+          }
+
+          // example metrics (some may be placeholders depending on sheet)
+          const debtEquity = 1.2;
+          const eps = 25.6;
+
+          document.getElementById('result-area').innerHTML = `
+            <h3>📊 Valuation Results</h3>
+            <p><b>NPV:</b> ₹ ${npv.toFixed(2)}</p>
+            <p><b>IRR:</b> ${(irr * 100).toFixed(2)}%</p>
+            <p><b>ROI:</b> ${roi.toFixed(2)}%</p>
+            <p><b>CAGR:</b> ${(cagr * 100).toFixed(2)}%</p>
+            <p><b>Debt-to-Equity Ratio:</b> ${debtEquity}</p>
+            <p><b>EPS:</b> ₹ ${eps}</p>
+          `;
+
+          // Save DCF results to localStorage using computed values
+          const dcfResults = {
+            npv: parseFloat(npv.toFixed(4)),
+            irr: parseFloat((irr * 100).toFixed(4)), // store as percent
+            roi: parseFloat(roi.toFixed(4)),
+            cagr: parseFloat((cagr * 100).toFixed(4)),
+            debtEquity: debtEquity,
+            eps: eps
+          };
+
+          localStorage.setItem("dcfResults", JSON.stringify(dcfResults));
+          console.log("✅ DCF Results saved:", dcfResults);
+          alert("✅ DCF results saved successfully! Open Analytics to see updates.");
+        } catch (err) {
+          console.error(err);
+          alert("Error processing the Excel file: " + err.message);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    });
+
+    // IRR Function (Newton-Raphson) - restored and robust
+    function calculateIRR(cashFlows, guess = 0.1) {
+      // handle simple cases
+      if (!Array.isArray(cashFlows) || cashFlows.length === 0) return 0;
+      let irr = guess;
+      for (let i = 0; i < 200; i++) {
+        let npv = 0;
+        let dNPV = 0;
+        for (let t = 0; t < cashFlows.length; t++) {
+          npv += cashFlows[t] / Math.pow(1 + irr, t);
+          dNPV += -t * cashFlows[t] / Math.pow(1 + irr, t + 1);
+        }
+        if (dNPV === 0) break;
+        const newIRR = irr - npv / dNPV;
+        if (!isFinite(newIRR)) break;
+        if (Math.abs(newIRR - irr) < 1e-7) return newIRR;
+        irr = newIRR;
+      }
+      return irr;
+    }
+
+    // Three-Statement Model Logic - restored original calculations
+    document.getElementById('calc-3stmt')?.addEventListener('click', () => {
+      const revenue = +document.getElementById('revenue').value || 0;
+      const cogs = +document.getElementById('cogs').value || 0;
+      const opex = +document.getElementById('opex').value || 0;
+      const depr = +document.getElementById('depr').value || 0;
+      const interest = +document.getElementById('interest').value || 0;
+      const taxrateInput = document.getElementById('taxrate').value;
+      const taxrate = (taxrateInput !== "" && !isNaN(taxrateInput)) ? (+taxrateInput / 100) : 0.3;
+
+      const grossProfit = revenue - cogs;
+      const ebit = grossProfit - opex - depr;
+      const ebt = ebit - interest;
+      const tax = ebt * taxrate;
+      const netIncome = ebt - tax;
+
+      const operatingCF = netIncome + depr;
+      const investingCF = -20000;
+      const financingCF = 10000;
+      const netChangeCash = operatingCF + investingCF + financingCF;
+      const endingCash = 50000 + netChangeCash;
+
+      document.getElementById('three-result').innerHTML = `
+        <h3>📘 Income Statement</h3>
+        <p><b>Gross Profit:</b> ₹ ${grossProfit.toFixed(2)}</p>
+        <p><b>EBIT:</b> ₹ ${ebit.toFixed(2)}</p>
+        <p><b>Net Income:</b> ₹ ${netIncome.toFixed(2)}</p>
+
+        <h3>💰 Cash Flow Statement</h3>
+        <p><b>Operating Cash Flow:</b> ₹ ${operatingCF.toFixed(2)}</p>
+        <p><b>Investing Cash Flow:</b> ₹ ${investingCF}</p>
+        <p><b>Financing Cash Flow:</b> ₹ ${financingCF}</p>
+        <p><b>Net Change in Cash:</b> ₹ ${netChangeCash.toFixed(2)}</p>
+        <p><b>Ending Cash Balance:</b> ₹ ${endingCash.toFixed(2)}</p>
+      `;
+    });
+  </script>
+
+  <!-- Additional scripts: hero fade + section reveal behavior -->
+  <script>
+    (function(){
+      // Fade hero out then scroll to content when clicking Get Started
+      const cta = document.getElementById('overview-cta');
+      const hero = document.querySelector('.hero');
+      const target = document.getElementById('financial-models') || document.getElementById('overview-content');
+
+      cta && cta.addEventListener('click', function(e){
+        e.preventDefault();
+        if (!hero) {
+          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          return;
+        }
+
+        // fade out hero (keeps DOM in place so layout doesn't jump)
+        hero.classList.add('fade-out');
+
+        // after fade completes, scroll to main content area
+        setTimeout(() => {
+          if (target) {
+            // ensure the section is visible (some are display:none by nav logic)
+            target.classList.add('active');
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+          // optionally hide the hero visually (keeps DOM so no JS references break)
+          hero.style.display = 'none';
+        }, 900); // matches .hero.fade-out transition
+      });
+
+      // Learn More scrolls to the overview-content (if present)
+      const learn = document.getElementById('overview-learn');
+      learn && learn.addEventListener('click', function(e){
+        e.preventDefault();
+        const content = document.getElementById('overview-content') || document.getElementById('financial-models');
+        if(content) {
+          content.classList.add('active');
+          content.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+
+      // Intersection observer for section reveal
+      const sections = document.querySelectorAll('.section');
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) entry.target.classList.add('visible');
+        });
+      }, { threshold: 0.2 });
+
+      sections.forEach(s => io.observe(s));
+    })();
+  </script>
+</body>
+</html>

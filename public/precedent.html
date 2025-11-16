@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Precedent Transaction Analysis</title>
+  <style>
+    :root{
+      --accent:#1e40af;
+      --accent-2:#2563eb;
+      --muted:#6b7280;
+      --card:#ffffff;
+      --bg:linear-gradient(135deg,#f8fafc,#eef2f7);
+    }
+    body{
+      margin:0;
+      font-family:"Poppins",system-ui,Segoe UI,Roboto,Arial;
+      background:var(--bg);
+      color:#0f172a;
+      padding:28px;
+    }
+
+    .container{
+      max-width:980px;
+      margin:0 auto;
+      background: #fff;
+      border-radius:12px;
+      box-shadow:0 10px 30px rgba(15,23,42,0.07);
+      overflow:hidden;
+    }
+
+    header{
+      padding:26px 32px;
+      border-bottom:1px solid #eef2f7;
+      background:linear-gradient(90deg,rgba(37,99,235,0.06), rgba(99,102,241,0.03));
+    }
+    header h1{ margin:0; color:var(--accent); font-size:1.4rem; }
+    header p{ margin:6px 0 0; color:var(--muted); font-size:0.95rem; }
+
+    main{ padding:22px 32px; }
+
+    .card{
+      background:#f9fafb;
+      padding:18px;
+      border-radius:10px;
+      margin-bottom:18px;
+      box-shadow:inset 0 0 8px rgba(2,6,23,0.02);
+    }
+
+    table{ width:100%; border-collapse:collapse; margin-top:12px; }
+    th, td{ padding:10px; border:1px solid #e6eefb; text-align:center; font-size:0.95rem; }
+    th{ background:#eef6ff; color:var(--accent-2); font-weight:600; }
+
+    input[type="text"], input[type="number"]{
+      width:92%;
+      padding:7px 8px;
+      border-radius:6px;
+      border:1px solid #d1d9ee;
+      background:#fff;
+      text-align:center;
+      font-size:0.95rem;
+    }
+
+    .controls{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
+    .btn{
+      background:linear-gradient(90deg,var(--accent-2),var(--accent));
+      color:white; border:none; padding:10px 16px; border-radius:8px; cursor:pointer; font-weight:600;
+    }
+    .btn.ghost{ background:transparent; color:var(--accent); border:1px solid #dbeafe; }
+    .small { padding:8px 12px; font-size:0.9rem; }
+
+    .form-grid{ display:grid; grid-template-columns: 220px 1fr; gap:10px 18px; align-items:center; margin-top:12px; }
+    .form-grid label{ text-align:right; color:var(--muted); padding-right:6px; font-weight:600; }
+
+    #result{
+      margin-top:14px;
+      background:#eef6ff;
+      padding:14px;
+      border-radius:8px;
+      border:1px solid #dbeafe;
+    }
+
+    .back { display:inline-block; margin-bottom:14px; text-decoration:none; color:var(--accent); font-weight:600; }
+    @media(max-width:720px){
+      .form-grid{ grid-template-columns: 1fr; }
+      .form-grid label{ text-align:left; padding-right:0; }
+      input[type="text"], input[type="number"]{ width:100%; }
+      th, td{ font-size:0.85rem; padding:8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Precedent Transaction Analysis</h1>
+      <p>Enter historical M&A deals to compute average transaction multiples (EV/EBITDA, P/E) and apply them to value your target company.</p>
+    </header>
+
+    <main>
+      <a class="back" href="dashboard.html">⬅ Back to Dashboard</a>
+
+      <div class="card">
+        <h3 style="margin:0 0 8px 0; color:#0b1220">Transaction / Deal Inputs</h3>
+        <p style="margin:0 0 10px 0; color:var(--muted)">Add one row per precedent transaction. The tool will compute EV/EBITDA and P/E for each deal if you provide Deal Value / Target EBITDA and/or Deal Price / Target Net Income.</p>
+
+        <table id="tx-table" role="grid" aria-label="Transactions table">
+          <thead>
+            <tr>
+              <th>Acquirer</th>
+              <th>Target</th>
+              <th>Deal Value (EV) ₹ Cr</th>
+              <th>Target EBITDA ₹ Cr</th>
+              <th>EV/EBITDA</th>
+              <th>Deal Price (Equity) ₹ Cr</th>
+              <th>Target Net Income ₹ Cr</th>
+              <th>P/E</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="text" placeholder="Acquirer A" /></td>
+              <td><input type="text" placeholder="Target A" /></td>
+              <td><input type="number" step="0.01" value="5000" /></td>
+              <td><input type="number" step="0.01" value="400" /></td>
+              <td><input type="number" step="0.01" readonly /></td>
+              <td><input type="number" step="0.01" value="" /></td>
+              <td><input type="number" step="0.01" value="" /></td>
+              <td><input type="number" step="0.01" readonly /></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="controls" style="margin-top:12px;">
+          <button class="btn small" id="add-tx">+ Add Transaction</button>
+          <button class="btn small ghost" id="auto-calc">Auto-calc ratios</button>
+          <button class="btn small" id="clear-table">Clear</button>
+        </div>
+
+        <p style="margin-top:10px; color:var(--muted)">Tip: If you provide Deal Value and Target EBITDA, EV/EBITDA will be computed. If you provide Deal Price (equity paid) and Target Net Income, P/E will be computed.</p>
+      </div>
+
+      <div class="card">
+        <h3 style="margin:0 0 8px 0; color:#0b1220">Your Company (Target)</h3>
+        <div class="form-grid">
+          <label>Company Name:</label>
+          <input type="text" id="tgt-name" placeholder="e.g., TechNova Pvt Ltd" />
+
+          <label>Target EBITDA (₹ Cr):</label>
+          <input type="number" id="tgt-ebitda" placeholder="Enter EBITDA" />
+
+          <label>Target Net Income (₹ Cr):</label>
+          <input type="number" id="tgt-netincome" placeholder="Enter Net Income" />
+
+          <label>Shares Outstanding (Cr)</label>
+          <input type="number" id="tgt-shares" placeholder="Enter shares outstanding (Cr)" />
+        </div>
+
+        <div style="margin-top:12px;">
+          <button class="btn" id="run-pt">Calculate Implied Valuations</button>
+        </div>
+
+        <div id="result" style="display:none;"></div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Helpers
+    const tbody = document.querySelector("#tx-table tbody");
+    const addTxBtn = document.getElementById("add-tx");
+    const autoCalcBtn = document.getElementById("auto-calc");
+    const clearBtn = document.getElementById("clear-table");
+    const runBtn = document.getElementById("run-pt");
+    const resultBox = document.getElementById("result");
+
+    addTxBtn.addEventListener("click", () => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td><input type="text" placeholder="Acquirer" /></td>
+        <td><input type="text" placeholder="Target" /></td>
+        <td><input type="number" step="0.01" /></td>
+        <td><input type="number" step="0.01" /></td>
+        <td><input type="number" step="0.01" readonly /></td>
+        <td><input type="number" step="0.01" /></td>
+        <td><input type="number" step="0.01" /></td>
+        <td><input type="number" step="0.01" readonly /></td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    autoCalcBtn.addEventListener("click", () => {
+      const rows = Array.from(tbody.querySelectorAll("tr"));
+      rows.forEach(r => {
+        const inputs = r.querySelectorAll("input");
+        const dealEV = parseFloat(inputs[2].value);
+        const tEbitda = parseFloat(inputs[3].value);
+        const dealPrice = parseFloat(inputs[5].value);
+        const tNet = parseFloat(inputs[6].value);
+
+        // EV/EBITDA
+        if (!isNaN(dealEV) && !isNaN(tEbitda) && tEbitda !== 0) {
+          inputs[4].value = (dealEV / tEbitda).toFixed(2);
+        } else {
+          inputs[4].value = "";
+        }
+
+        // P/E
+        if (!isNaN(dealPrice) && !isNaN(tNet) && tNet !== 0) {
+          inputs[7].value = (dealPrice / tNet).toFixed(2);
+        } else {
+          inputs[7].value = "";
+        }
+      });
+      alert("Ratios auto-calculated where possible.");
+    });
+
+    clearBtn.addEventListener("click", () => {
+      // Remove all rows except first
+      const rows = Array.from(tbody.querySelectorAll("tr"));
+      rows.slice(1).forEach(r => r.remove());
+      // clear first row values
+      const firstInputs = tbody.querySelector("tr").querySelectorAll("input");
+      firstInputs.forEach((inp, idx) => {
+        if (idx===2) inp.value = "5000";
+        else if (idx===3) inp.value = "400";
+        else inp.value = "";
+      });
+    });
+
+    runBtn.addEventListener("click", () => {
+      // gather ratios
+      const rows = Array.from(tbody.querySelectorAll("tr"));
+      let evEbitdaList = [], pEList = [];
+      rows.forEach(r => {
+        const inputs = r.querySelectorAll("input");
+        const evE = parseFloat(inputs[4].value);
+        const pe = parseFloat(inputs[7].value);
+
+        if (!isNaN(evE) && isFinite(evE)) evEbitdaList.push(evE);
+        if (!isNaN(pe) && isFinite(pe)) pEList.push(pe);
+      });
+
+      if (evEbitdaList.length === 0 && pEList.length === 0) {
+        alert("Please provide at least one EV/EBITDA or P/E value (use Auto-calc or enter ratios).");
+        return;
+      }
+
+      const avg = arr => arr.reduce((a,b)=>a+b,0)/arr.length;
+      const avgEVEBITDA = evEbitdaList.length ? avg(evEbitdaList) : null;
+      const avgPE = pEList.length ? avg(pEList) : null;
+
+      // target inputs
+      const tgtName = document.getElementById("tgt-name").value || "Your Company";
+      const tgtEbitda = parseFloat(document.getElementById("tgt-ebitda").value);
+      const tgtNet = parseFloat(document.getElementById("tgt-netincome").value);
+      const tgtShares = parseFloat(document.getElementById("tgt-shares").value);
+
+      if ((avgEVEBITDA && isNaN(tgtEbitda)) && (avgPE && (isNaN(tgtNet) || isNaN(tgtShares)))) {
+        alert("Please enter required fields for valuation (EBITDA for EV/EBITDA valuation and/or Net Income + Shares for P/E valuation).");
+        return;
+      }
+
+      // compute
+      let impliedEV = null, impliedEquity = null, impliedPrice = null;
+      if (avgEVEBITDA !== null && !isNaN(tgtEbitda)) {
+        impliedEV = avgEVEBITDA * tgtEbitda; // in same units as inputs
+      }
+      if (avgPE !== null && !isNaN(tgtNet) && !isNaN(tgtShares) && tgtShares !== 0) {
+        impliedEquity = avgPE * tgtNet;
+        impliedPrice = impliedEquity / tgtShares;
+      }
+
+      // format numbers with separators
+      const fmt = (v) => {
+        if (v === null || v === undefined || isNaN(v)) return "—";
+        return Number(v).toLocaleString("en-IN", { maximumFractionDigits: 2 });
+      };
+
+      // show result
+      resultBox.style.display = "block";
+      resultBox.innerHTML = `
+        <strong style="color:${avgEVEBITDA? 'var(--accent)': '#333'}">Valuation Results — ${tgtName}</strong>
+        <div style="margin-top:8px; color:var(--muted)">
+          ${avgEVEBITDA !== null ? `<div><b>Avg EV/EBITDA:</b> ${avgEVEBITDA.toFixed(2)}x</div>` : ""}
+          ${avgPE !== null ? `<div><b>Avg P/E:</b> ${avgPE.toFixed(2)}x</div>` : ""}
+        </div>
+        <hr style="border:none; height:1px; background:#e6f0ff; margin:10px 0;">
+        <div style="display:flex; gap:18px; flex-wrap:wrap;">
+          <div><b>Implied Enterprise Value (₹ Cr):</b><br>${fmt(impliedEV)}</div>
+          <div><b>Implied Equity Value (₹ Cr):</b><br>${fmt(impliedEquity)}</div>
+          <div><b>Implied Share Price (₹):</b><br>${fmt(impliedPrice)}</div>
+        </div>
+
+        <div style="margin-top:10px; color:var(--muted)">
+          <small>Note: Inputs must be in consistent units (e.g., ₹ Cr). P/E uses equity price paid ÷ net income. EV/EBITDA uses deal EV ÷ target EBITDA.</small>
+        </div>
+      `;
+    });
+
+    // calculate EV/EBITDA & P/E on table input change (small convenience)
+    tbody.addEventListener("input", (e) => {
+      const row = e.target.closest("tr");
+      if (!row) return;
+      const inputs = row.querySelectorAll("input");
+      const dealEV = parseFloat(inputs[2].value);
+      const tEbitda = parseFloat(inputs[3].value);
+      const dealPrice = parseFloat(inputs[5].value);
+      const tNet = parseFloat(inputs[6].value);
+
+      if (!isNaN(dealEV) && !isNaN(tEbitda) && tEbitda !== 0) {
+        inputs[4].value = (dealEV / tEbitda).toFixed(2);
+      } else { inputs[4].value = ""; }
+
+      if (!isNaN(dealPrice) && !isNaN(tNet) && tNet !== 0) {
+        inputs[7].value = (dealPrice / tNet).toFixed(2);
+      } else { inputs[7].value = ""; }
+    });
+
+  </script>
+</body>
+</html>

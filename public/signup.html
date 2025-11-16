@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Create Account - IB Modeler</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Left side (image) -->
+    <div class="bg-section"></div>
+
+    <!-- Right side (signup sector) -->
+    <div class="login-sector">
+      <div class="login-box">
+        <h2>Create Account</h2>
+        <p class="subtitle">Join IB Modeler — secure & fast</p>
+
+        <!-- ONLY CHANGE: method+action added -->
+        <form id="signupForm" novalidate method="POST" action="/signup">
+          <div class="input-group">
+            <label for="name">Full name</label>
+            <input id="name" name="name" type="text" placeholder="Your full name" required>
+          </div>
+
+          <div class="input-group">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" placeholder="you@company.com" required>
+          </div>
+
+          <div class="input-group">
+            <label for="pwd">Password</label>
+            <input id="pwd" name="password" type="password" placeholder="Create a password (min 8 chars)" required>
+          </div>
+
+          <div class="input-group">
+            <label for="pwd2">Confirm Password</label>
+            <input id="pwd2" name="password_confirm" type="password" placeholder="Confirm password" required>
+          </div>
+
+          <button class="login-btn" type="submit">Create account</button>
+
+          <!-- Separator -->
+          <div class="separator"><span>or</span></div>
+
+          <!-- Social login -->
+          <div class="social-login">
+            <a href="google.html" class="social-btn google"><i class="fab fa-google"></i> Sign up with Google</a>
+            <a href="apple.html" class="social-btn apple"><i class="fab fa-apple"></i> Sign up with Apple</a>
+            <a href="facebook.html" class="social-btn facebook"><i class="fab fa-facebook-f"></i> Sign up with Facebook</a>
+            <a href="linkedin.html" class="social-btn linkedin"><i class="fab fa-linkedin-in"></i> Sign up with LinkedIn</a>
+          </div>
+
+          <div class="extras">
+            <a href="index.html">Already have an account? Login</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+
+
+
+
+  <script>
+    // Simple signup validation
+    document.getElementById('signupForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      const form = this;
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const pwd = document.getElementById('pwd').value;
+      const pwd2 = document.getElementById('pwd2').value;
+
+      if (!name || !email || !pwd || !pwd2) {
+        alert("Please fill out all fields.");
+        return;
+      }
+      if (pwd.length < 8) {
+        alert("Password must be at least 8 characters.");
+        return;
+      }
+      if (pwd !== pwd2) {
+        alert("Passwords do not match.");
+        return;
+      }
+
+      // ONLY CHANGE: submit to the server so it saves to SQLite and redirects
+      form.submit();
+    });
+    document.getElementById("loginForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+  const email = document.getElementById("email").value;
+  const name = document.getElementById("name")?.value || "User";
+
+  // Save user details
+  localStorage.setItem("loggedUser", JSON.stringify({ name, email }));
+
+  // Redirect to dashboard
+  window.location.href = "dashboard.html";
+});
+  </script>
+</body>
+</html>

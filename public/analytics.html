@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Company Analytics Comparison</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: #f8fafc;
+      margin: 0;
+      padding: 40px;
+    }
+    h1 { text-align: center; }
+    .input-box {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+    input {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 150px;
+    }
+    button {
+      padding: 10px 20px;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .charts {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+      margin-top: 30px;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+
+<body>
+  <h1>📊 Company Analytics Comparison</h1>
+
+  <div id="input-area">
+    <div class="input-box">
+      <input type="text" placeholder="Company Name" class="name">
+      <input type="number" placeholder="Revenue (Cr)" class="revenue">
+      <input type="number" placeholder="Profit (Cr)" class="profit">
+      <input type="number" placeholder="Valuation (Cr)" class="valuation">
+    </div>
+    <div class="input-box">
+      <input type="text" placeholder="Company Name" class="name">
+      <input type="number" placeholder="Revenue (Cr)" class="revenue">
+      <input type="number" placeholder="Profit (Cr)" class="profit">
+      <input type="number" placeholder="Valuation (Cr)" class="valuation">
+    </div>
+    <div class="input-box">
+      <input type="text" placeholder="Company Name" class="name">
+      <input type="number" placeholder="Revenue (Cr)" class="revenue">
+      <input type="number" placeholder="Profit (Cr)" class="profit">
+      <input type="number" placeholder="Valuation (Cr)" class="valuation">
+    </div>
+    <button onclick="generateCharts()">Generate Charts</button>
+  </div>
+
+  <div class="charts">
+    <div class="card"><canvas id="barChart"></canvas></div>
+    <div class="card"><canvas id="lineChart"></canvas></div>
+    <div class="card"><canvas id="pieChart"></canvas></div>
+  </div>
+
+  <script>
+    let barChart, lineChart, pieChart;
+
+    function generateCharts() {
+      const names = [...document.querySelectorAll('.name')].map(i => i.value || "N/A");
+      const revenues = [...document.querySelectorAll('.revenue')].map(i => Number(i.value) || 0);
+      const profits = [...document.querySelectorAll('.profit')].map(i => Number(i.value) || 0);
+      const valuations = [...document.querySelectorAll('.valuation')].map(i => Number(i.value) || 0);
+
+      const colors = ['#2563eb','#22c55e','#facc15','#ef4444'];
+
+      // Destroy previous charts if they exist
+      [barChart, lineChart, pieChart].forEach(c => c && c.destroy());
+
+      // Bar chart - Revenue comparison
+      barChart = new Chart(document.getElementById('barChart'), {
+        type: 'bar',
+        data: {
+          labels: names,
+          datasets: [{
+            label: 'Revenue (Cr)',
+            data: revenues,
+            backgroundColor: colors
+          }]
+        },
+        options: { plugins: { legend: { display: false } } }
+      });
+
+      // Line chart - Profit trend comparison
+      lineChart = new Chart(document.getElementById('lineChart'), {
+        type: 'line',
+        data: {
+          labels: names,
+          datasets: [{
+            label: 'Profit (Cr)',
+            data: profits,
+            borderColor: '#22c55e',
+            backgroundColor: 'rgba(34,197,94,0.2)',
+            fill: true,
+            tension: 0.3
+          }]
+        },
+        options: { plugins: { legend: { display: false } } }
+      });
+
+      // Pie chart - Valuation distribution
+      pieChart = new Chart(document.getElementById('pieChart'), {
+        type: 'pie',
+        data: {
+          labels: names,
+          datasets: [{
+            label: 'Valuation',
+            data: valuations,
+            backgroundColor: colors
+          }]
+        }
+      });
+    }
+  </script>
+</body>
+</html>

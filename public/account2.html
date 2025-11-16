@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account - FinView</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: #000;
+      color: #e5e5e5;
+      font-family: "Poppins", sans-serif;
+    }
+    nav {
+      background: #000;
+      color: #e5e5e5;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.7);
+    }
+    nav h1 { color: #e50914; }
+    nav a { color: #b3b3b3; font-weight: 500; transition: 0.25s; }
+    nav a:hover, nav a.font-semibold {
+      color: #fff;
+      text-shadow: 0 0 4px rgba(229,9,20,0.8);
+    }
+
+    .card {
+      background: #141414;
+      border-radius: 10px;
+      box-shadow: 0 6px 20px rgba(229,9,20,0.15);
+      padding: 2rem;
+      color: #fff;
+    }
+
+    .section-title {
+      color: #e50914;
+      font-weight: 700;
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+    }
+
+    input, textarea {
+      background: #1f1f1f;
+      border: 1px solid #333;
+      color: #fff;
+      border-radius: 6px;
+      padding: 10px;
+      width: 100%;
+      font-size: 0.95rem;
+      transition: border 0.2s;
+    }
+    input:focus, textarea:focus {
+      border-color: #e50914;
+      outline: none;
+    }
+
+    button {
+      font-weight: 600;
+      border-radius: 6px;
+      padding: 10px 18px;
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+    }
+    #saveBtn { background: #e50914; color: #fff; }
+    #editBtn { background: #b81d24; color: #fff; }
+    #clearBtn { background: #8b0000; color: #fff; }
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 20px rgba(229,9,20,0.3);
+    }
+
+    .info-box {
+      border-bottom: 1px solid #333;
+      padding: 20px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .info-label {
+      font-weight: 600;
+      color: #999;
+    }
+
+    .info-value {
+      color: #fff;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav class="p-4 flex justify-between items-center">
+    <h1 class="text-2xl font-bold">FinView</h1>
+    <div class="space-x-6">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="analytics.html">Analytics</a>
+      <a href="account2.html" class="font-semibold text-yellow-300">Account</a>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="max-w-4xl mx-auto mt-10 card">
+    <h2 class="section-title text-center">Account</h2>
+
+    <!-- ACCOUNT INFO (Netflix-style summary section) -->
+    <div id="user-details" class="mb-6">
+      <div class="info-box">
+        <span class="info-label">Name</span>
+        <span id="userName" class="info-value">Loading...</span>
+      </div>
+      <div class="info-box">
+        <span class="info-label">Email</span>
+        <span id="userEmail" class="info-value">Loading...</span>
+      </div>
+    </div>
+
+    <!-- Editable Info Section -->
+    <h3 class="section-title text-left text-lg mt-8">Profile Details</h3>
+    <form id="accountForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <label class="block font-semibold mb-2">Full Name</label>
+        <input type="text" id="name" placeholder="Enter your name" />
+      </div>
+      <div>
+        <label class="block font-semibold mb-2">Email</label>
+        <input type="email" id="email" placeholder="you@example.com" />
+      </div>
+      <div>
+        <label class="block font-semibold mb-2">Company Name</label>
+        <input type="text" id="company" placeholder="Company Pvt Ltd" />
+      </div>
+      <div>
+        <label class="block font-semibold mb-2">Role / Position</label>
+        <input type="text" id="role" placeholder="Analyst / Manager" />
+      </div>
+      <div class="md:col-span-2">
+        <label class="block font-semibold mb-2">Bio</label>
+        <textarea id="bio" rows="4" placeholder="Tell us about yourself..."></textarea>
+      </div>
+    </form>
+
+    <!-- BUTTONS -->
+    <div class="flex justify-center gap-6 mt-8">
+      <button id="saveBtn">💾 Save</button>
+      <button id="editBtn">✏️ Edit</button>
+      <button id="clearBtn">🗑️ Clear</button>
+    </div>
+  </div>
+
+  <script>
+    // ✅ Load user details from localStorage (set during login)
+    const user = JSON.parse(localStorage.getItem("loggedInUser"));
+
+    if (user) {
+      document.getElementById("userName").textContent = user.name;
+      document.getElementById("userEmail").textContent = user.email;
+      document.getElementById("name").value = user.name;
+      document.getElementById("email").value = user.email;
+      document.getElementById("company").value = user.company || "";
+      document.getElementById("role").value = user.role || "";
+      document.getElementById("bio").value = user.bio || "";
+    } else {
+      document.getElementById("user-details").innerHTML = "<p class='text-center text-gray-400'>No user logged in.</p>";
+    }
+
+    // ✅ Save updated info to localStorage
+    document.getElementById("saveBtn").addEventListener("click", () => {
+      const updatedUser = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        company: document.getElementById("company").value,
+        role: document.getElementById("role").value,
+        bio: document.getElementById("bio").value
+      };
+      localStorage.setItem("loggedInUser", JSON.stringify(updatedUser));
+      alert("✅ Account details saved successfully!");
+    });
+
+    // Edit (no special logic — just lets user modify fields)
+    document.getElementById("editBtn").addEventListener("click", () => {
+      alert("✏️ You can now edit your details.");
+    });
+
+    // Clear form + localStorage
+    document.getElementById("clearBtn").addEventListener("click", () => {
+      localStorage.removeItem("loggedInUser");
+      document.getElementById("accountForm").reset();
+      document.getElementById("userName").textContent = "Deleted";
+      document.getElementById("userEmail").textContent = "Deleted";
+      alert("🗑️ Cleared account data!");
+    });
+  </script>
+</body>
+</html>

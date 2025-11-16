@@ -1,0 +1,237 @@
+/* Reset */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  font-family: Arial, sans-serif;
+}
+
+/* Flex container with 2 sides */
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+/* LEFT SIDE (background image) */
+.bg-section {
+  flex: 0 0 70%;
+  background: url('https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=2000&q=80')
+              no-repeat center center/cover;
+}
+
+/* RIGHT SIDE (login) */
+.login-sector {
+  flex: 0 0 30%;
+  background: #f9f6f2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* LOGIN BOX */
+.login-box {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  width: 90%;
+  max-width: 350px;
+  text-align: center;
+}
+
+h2 {
+  margin: 0 0 5px;
+}
+
+.subtitle {
+  margin-bottom: 20px;
+  color: #666;
+}
+
+/* SOCIAL BUTTONS */
+.social-login {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.social-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+  justify-content: center;
+}
+
+.social-btn img {
+  width: 20px;
+  height: 20px;
+}
+
+/* BUTTON COLORS */
+.google { background: #db4437; }
+.github { background: #333; }
+.linkedin { background: #0077b5; }
+
+.divider {
+  margin: 20px 0;
+  color: #aaa;
+  font-size: 14px;
+}
+
+/* INPUT FIELDS */
+.input-group {
+  text-align: left;
+  margin-bottom: 15px;
+}
+
+.input-group label {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 12px;
+  background: #0077cc;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+/* SIGNUP */
+.signup-text {
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.signup-text a {
+  color: #0077cc;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* ALT PAGES (Google, GitHub, LinkedIn, etc.) */
+.alt-page {
+  background: #f9f6f2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.message-box {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  text-align: center;
+  width: 90%;
+  max-width: 400px;
+}
+
+.message-box h2 {
+  margin-bottom: 15px;
+}
+
+.back-btn {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 10px 15px;
+  background: #0077cc;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+/* --- Valuation Tools Section --- */
+#valuation-tools {
+  background: #f9f6f2;
+  padding: 60px;
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+#valuation-tools h1 {
+  font-size: 32px;
+  color: #1e293b;
+  margin-bottom: 10px;
+}
+
+#valuation-tools p {
+  color: #555;
+  margin-bottom: 40px;
+  font-size: 16px;
+}
+
+/* --- Grid Layout for Tools --- */
+.tools-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+}
+
+/* --- Individual Tool Card --- */
+.tool-card {
+  background: #fff;
+  padding: 25px 30px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  width: 320px;
+  text-align: center;
+}
+
+.tool-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+/* --- Inside Card Elements --- */
+.tool-card h2 {
+  color: #0077cc;
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.tool-card p {
+  color: #555;
+  font-size: 14px;
+  min-height: 50px;
+  margin-bottom: 20px;
+}
+
+/* --- Open Tool Button --- */
+.tool-card .btn {
+  padding: 10px 20px;
+  background: #0077cc;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.tool-card .btn:hover {
+  background: #005fa3;
+}

@@ -1,0 +1,137 @@
+<!--Index.html-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IB Modeler Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Left side with finance image -->
+    <div class="bg-section"></div>
+
+    <!-- Right side login -->
+    <div class="login-sector">
+      <div class="login-box">
+        <h2>IB Modeler</h2>
+        <p class="subtitle">AI-powered financial modelling</p>
+
+        <!-- Replaced social login buttons with User/Admin selector -->
+        <div class="input-group" style="margin-bottom:12px;">
+          <label for="userType" style="display:block;margin-bottom:6px;color:#ddd;">Login As</label>
+          <select id="userType" required style="width:100%;padding:10px;border-radius:6px;background:#111;color:#fff;border:1px solid #333;">
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+
+        <div class="divider" style="margin:14px 0; color:#bbb; text-align:center;">or</div>
+
+        <!-- Email login form -->
+        <form id="loginForm">
+          <div class="input-group">
+            <label>Email</label>
+            <input type="email" id="email" placeholder="Enter your email" required>
+          </div>
+          <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Enter your password" required>
+          </div>
+          <button type="submit" class="login-btn">Login</button>
+        </form>
+
+        <!-- Create account -->
+        <p class="signup-text" style="margin-top:12px;">
+          Don’t have an account? <a href="signup.html">Create Account</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login script: posts to /login or /adminLogin, saves user and redirects -->
+  <script>
+    (function () {
+      const form = document.getElementById('loginForm');
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const userType = document.getElementById('userType').value;
+
+        if (!email || !password) {
+          alert('Please enter email and password.');
+          return;
+        }
+
+        try {
+          // send login to appropriate endpoint
+          const endpoint = userType === 'admin' ? '/adminLogin' : '/login';
+
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+          });
+
+          // parse JSON safely
+          const data = await (async () => {
+            try { return await response.json(); } catch (e) { return null; }
+          })();
+
+          if (!response.ok) {
+            // try to show server-provided message, fallback to generic
+            const msg = (data && (data.message || data.error)) ? (data.message || data.error) : 'Invalid credentials';
+            alert(msg);
+            return;
+          }
+
+          // success - backend may return { user: {...} } or top-level fields; handle both
+          let userObj = null;
+          if (data) {
+            if (data.user && typeof data.user === 'object') userObj = data.user;
+            else if (data.name || data.email || data.id) userObj = data;
+          }
+
+          // fallback if backend gave no user object: create a minimal one
+          if (!userObj) {
+            userObj = {
+              name: email.split('@')[0],
+              email
+            };
+          }
+
+          // normalize fields we want to store
+          const stored = {
+            id: userObj.id || userObj.userId || null,
+            name: userObj.name || userObj.fullname || email.split('@')[0],
+            email: userObj.email || email,
+            role: userType === 'admin' ? 'Administrator' : (userObj.role || 'User'),
+            company: userObj.company || null,
+            bio: userObj.bio || ''
+          };
+
+          // save to localStorage so other pages (dashboard/account) can read
+          localStorage.setItem('loggedInUser', JSON.stringify(stored));
+
+          alert((userType === 'admin' ? 'Admin' : 'User') + ' login successful!');
+
+          // redirect: admin -> admin_dashboard.html (you can change), user -> dashboard.html
+          if (userType === 'admin') {
+            window.location.href = 'admin_dashboard.html';
+          } else {
+            window.location.href = 'dashboard.html';
+          }
+        } catch (error) {
+          console.error('Login error:', error);
+          alert('Server error, please try again later.');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

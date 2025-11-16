@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LBO Model — AI Finance</title>
+  <style>
+    :root {
+      --accent: #1d4ed8;
+      --muted: #6b7280;
+      --card-bg: #fff;
+      --page-bg: linear-gradient(135deg,#f7f9fc,#eef2f7);
+    }
+    body {
+      margin: 0;
+      font-family: "Poppins", Arial, sans-serif;
+      background: var(--page-bg);
+      color: #0f172a;
+      padding: 28px;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 12px 30px rgba(2,6,23,0.06);
+      overflow: hidden;
+    }
+
+    header {
+      padding: 22px 28px;
+      border-bottom: 1px solid #eef2f7;
+      background: linear-gradient(90deg, rgba(37,99,235,0.05), rgba(99,102,241,0.02));
+    }
+    header h1 { margin: 0; color: var(--accent); font-size: 1.3rem; }
+    header p { margin: 6px 0 0; color: var(--muted); font-size: 0.95rem; }
+
+    main { padding: 22px 28px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 22px;
+    }
+
+    .card {
+      background: #f9fafb;
+      padding: 16px;
+      border-radius: 10px;
+      box-shadow: inset 0 0 8px rgba(2,6,23,0.02);
+    }
+
+    label { display:block; font-weight:600; margin-bottom:6px; color:#0b1220; }
+    .input-row { margin-bottom:12px; }
+    input[type="number"], input[type="text"], select {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #d1d9ee;
+      background: #fff;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+    }
+
+    .btn {
+      background: linear-gradient(90deg,var(--accent), #2563eb);
+      color: white;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+    .btn.ghost { background: #fff; color: var(--accent); border:1px solid #dbeafe; }
+
+    .result {
+      background: #eef6ff;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #dbeafe;
+      margin-top: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      padding: 8px;
+      text-align: right;
+      border-bottom: 1px solid #e6eefb;
+      font-size: 0.92rem;
+    }
+    th { text-align: left; background: #f1f7ff; color: var(--accent); font-weight:700; }
+
+    .back { display:inline-block; margin-bottom:14px; text-decoration:none; color:var(--accent); font-weight:700; }
+
+    @media(max-width:920px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Leveraged Buyout (LBO) Model</h1>
+      <p>Interactive LBO calculator: enter purchase assumptions and forecast to compute Equity IRR & Cash-on-Cash multiple.</p>
+    </header>
+
+    <main>
+      <a class="back" href="dashboard.html">⬅ Back to Dashboard</a>
+
+      <div class="grid">
+        <!-- Left: Inputs & Outputs -->
+        <div>
+          <div class="card">
+            <h3 style="margin-top:0">Transaction & Operating Assumptions</h3>
+
+            <div class="input-row">
+              <label>Enterprise Value / Purchase Price (₹ Cr)</label>
+              <input id="purchasePrice" type="number" value="1000" />
+            </div>
+
+            <div class="input-row">
+              <label>Debt % of Purchase Price</label>
+              <input id="debtPct" type="number" step="0.01" value="70" />
+            </div>
+
+            <div class="input-row">
+              <label>Interest Rate on Debt (annual %)</label>
+              <input id="interestRate" type="number" step="0.01" value="8" />
+            </div>
+
+            <div class="input-row">
+              <label>Amortization method</label>
+              <select id="amortMethod">
+                <option value="straight">Straight-line principal repayment</option>
+                <option value="bullet">Bullet (principal repaid at exit)</option>
+              </select>
+            </div>
+
+            <div class="input-row">
+              <label>Holding Period (years)</label>
+              <input id="years" type="number" step="1" value="5" />
+            </div>
+
+            <div class="input-row">
+              <label>Starting EBITDA (₹ Cr)</label>
+              <input id="ebitda0" type="number" value="120" />
+            </div>
+
+            <div class="input-row">
+              <label>EBITDA growth (annual %)</label>
+              <input id="ebitdaGrowth" type="number" step="0.01" value="8" />
+            </div>
+
+            <div class="input-row">
+              <label>Exit EV / EBITDA multiple</label>
+              <input id="exitMultiple" type="number" step="0.1" value="8" />
+            </div>
+
+            <div class="input-row">
+              <label>Tax rate (%)</label>
+              <input id="taxRate" type="number" step="0.1" value="25" />
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:8px;">
+              <button class="btn" id="run">Run LBO</button>
+              <button class="btn ghost" id="reset">Reset</button>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:14px;">
+            <h3 style="margin-top:0">Key Outputs</h3>
+            <div id="overviewResults" class="result">
+              <div><strong>Initial Equity Invested:</strong> <span id="outEquity">—</span></div>
+              <div><strong>Initial Debt Drawn:</strong> <span id="outDebt">—</span></div>
+              <div style="margin-top:8px;"><strong>Exit Equity Value:</strong> <span id="outExitEquity">—</span></div>
+              <div><strong>Cash-on-Cash multiple:</strong> <span id="outCashMul">—</span></div>
+              <div><strong>Equity IRR (annual):</strong> <span id="outIRR">—</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Schedules -->
+        <div>
+          <div class="card">
+            <h3 style="margin-top:0">Yearly Schedule</h3>
+            <div id="scheduleArea">
+              <p style="color:var(--muted)">Run the model to see the yearly debt schedule, EBITDA, cash to equity and exit values.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Utility for formatting
+    function fmt(num) {
+      if (num === null || num === undefined || isNaN(num)) return "—";
+      const n = Number(num);
+      return n.toLocaleString("en-IN", { maximumFractionDigits: 2 });
+    }
+
+    // IRR numeric method (Newton-Raphson)
+    function calcIRR(cashflows, guess = 0.2) {
+      let irr = guess;
+      for (let iter = 0; iter < 200; iter++) {
+        let npv = 0, dnpv = 0;
+        for (let t = 0; t < cashflows.length; t++) {
+          npv += cashflows[t] / Math.pow(1 + irr, t);
+          dnpv += -t * cashflows[t] / Math.pow(1 + irr, t + 1);
+        }
+        const newIrr = irr - npv / dnpv;
+        if (Math.abs(newIrr - irr) < 1e-7) return newIrr;
+        irr = newIrr;
+      }
+      return irr;
+    }
+
+    document.getElementById('run').addEventListener('click', runModel);
+    document.getElementById('reset').addEventListener('click', () => {
+      document.getElementById('purchasePrice').value = 1000;
+      document.getElementById('debtPct').value = 70;
+      document.getElementById('interestRate').value = 8;
+      document.getElementById('amortMethod').value = 'straight';
+      document.getElementById('years').value = 5;
+      document.getElementById('ebitda0').value = 120;
+      document.getElementById('ebitdaGrowth').value = 8;
+      document.getElementById('exitMultiple').value = 8;
+      document.getElementById('taxRate').value = 25;
+      document.getElementById('scheduleArea').innerHTML = '<p style="color:var(--muted)">Run the model to see the yearly debt schedule, EBITDA, cash to equity and exit values.</p>';
+      document.getElementById('outEquity').innerText = '—';
+      document.getElementById('outDebt').innerText = '—';
+      document.getElementById('outExitEquity').innerText = '—';
+      document.getElementById('outCashMul').innerText = '—';
+      document.getElementById('outIRR').innerText = '—';
+    });
+
+    function runModel() {
+      // Read inputs
+      const purchase = parseFloat(document.getElementById('purchasePrice').value) || 0;
+      const debtPct = (parseFloat(document.getElementById('debtPct').value) || 0) / 100;
+      const interestRate = (parseFloat(document.getElementById('interestRate').value) || 0) / 100;
+      const amortMethod = document.getElementById('amortMethod').value;
+      const years = parseInt(document.getElementById('years').value) || 5;
+      const ebitda0 = parseFloat(document.getElementById('ebitda0').value) || 0;
+      const ebitdaGrowth = (parseFloat(document.getElementById('ebitdaGrowth').value) || 0) / 100;
+      const exitMultiple = parseFloat(document.getElementById('exitMultiple').value) || 0;
+      const taxRate = (parseFloat(document.getElementById('taxRate').value) || 0) / 100;
+
+      // Initial financing
+      const debt0 = purchase * debtPct;
+      const equity0 = purchase - debt0;
+
+      // Build year-by-year arrays
+      const yearsArr = [];
+      let outstandingDebt = debt0;
+      const schedule = [];
+
+      // If amortization straight-line principal amount:
+      const principalPerYear = amortMethod === 'straight' ? (debt0 / years) : 0;
+
+      // Build cashflow to equity array for IRR (time 0 is initial equity outflow)
+      const cashflowsToEquity = [];
+      cashflowsToEquity.push(-equity0); // t=0
+
+      // simulate years 1..N
+      let ebitda = ebitda0;
+      for (let y = 1; y <= years; y++) {
+        // EBITDA for year y
+        if (y === 1) ebitda = ebitda0;
+        else ebitda = ebitda * (1 + ebitdaGrowth);
+
+        // Interest payment on opening debt
+        const interestPayment = outstandingDebt * interestRate;
+
+        // principal repayment
+        let principalRepayment = 0;
+        if (amortMethod === 'straight') {
+          principalRepayment = Math.min(principalPerYear, outstandingDebt);
+        } else { // bullet
+          principalRepayment = 0;
+        }
+
+        // Taxable income approximate = EBITDA - interest (ignore depreciation for simplicity)
+        const ebt = ebitda - interestPayment;
+        const tax = ebt > 0 ? ebt * taxRate : 0;
+
+        // Cash flow available to equity this year = (EBITDA - interest - tax) - principalRepayment
+        const cashToEquity = (ebitda - interestPayment - tax) - principalRepayment;
+
+        // update debt after principal repayment
+        outstandingDebt = outstandingDebt - principalRepayment;
+        if (outstandingDebt < 0) outstandingDebt = 0;
+
+        schedule.push({
+          year: y,
+          ebitda: ebitda,
+          interest: interestPayment,
+          tax: tax,
+          principalRepayment: principalRepayment,
+          outstandingDebt: outstandingDebt,
+          cashToEquity: cashToEquity
+        });
+
+        // push cash to equity for IRR at t = y
+        cashflowsToEquity.push(cashToEquity);
+      }
+
+      // Exit calculations at end of year N
+      const finalEBITDA = schedule.length ? schedule[schedule.length - 1].ebitda : ebitda;
+      const exitEnterpriseValue = finalEBITDA * exitMultiple;
+
+      // If bullet amortization, principal repaid at exit is full outstanding debt
+      let exitPrincipalRepayment = 0;
+      if (amortMethod === 'bullet') {
+        exitPrincipalRepayment = outstandingDebt;
+        outstandingDebt = 0;
+      }
+
+      // Equity proceeds at exit = Exit EV - outstanding debt (after repaying exit principal)
+      const exitDebtOutstanding = outstandingDebt; // after any exit principal repayment (if bullet we handled above)
+      const exitEquityValue = exitEnterpriseValue - exitDebtOutstanding;
+
+      // Add exit proceeds to equity cashflows (at t = years)
+      // Note: the last year's cashToEquity (from operations) already at index years; we add exit proceeds to that year
+      cashflowsToEquity[cashflowsToEquity.length - 1] += exitEquityValue;
+
+      // Compute IRR
+      const irr = calcIRR(cashflowsToEquity, 0.2);
+      const cashMultiple = (cashflowsToEquity.slice(1).reduce((a,b)=>a+b,0) + (-cashflowsToEquity[0])) / (-cashflowsToEquity[0]);
+
+      // Populate outputs
+      document.getElementById('outEquity').innerText = '₹ ' + fmt(equity0) + ' Cr';
+      document.getElementById('outDebt').innerText = '₹ ' + fmt(debt0) + ' Cr';
+      document.getElementById('outExitEquity').innerText = '₹ ' + fmt(exitEquityValue) + ' Cr';
+      document.getElementById('outCashMul').innerText = (isFinite(cashMultiple) ? cashMultiple.toFixed(2) + 'x' : '—');
+      document.getElementById('outIRR').innerText = (isFinite(irr) ? (irr*100).toFixed(2) + '%' : '—');
+
+      // Build schedule HTML
+      let html = `<table><thead><tr>
+        <th>Year</th><th>EBITDA (₹ Cr)</th><th>Interest</th><th>Tax</th><th>Principal Repayment</th><th>Outstanding Debt</th><th>Cash to Equity</th>
+      </tr></thead><tbody>`;
+      schedule.forEach(row => {
+        html += `<tr>
+          <td style="text-align:left">${row.year}</td>
+          <td>₹ ${fmt(row.ebitda)}</td>
+          <td>₹ ${fmt(row.interest)}</td>
+          <td>₹ ${fmt(row.tax)}</td>
+          <td>₹ ${fmt(row.principalRepayment)}</td>
+          <td>₹ ${fmt(row.outstandingDebt)}</td>
+          <td>₹ ${fmt(row.cashToEquity)}</td>
+        </tr>`;
+      });
+
+      // Add exit row
+      html += `<tr style="background:#f1f7ff">
+        <td style="text-align:left">Exit (Yr ${years})</td>
+        <td>₹ ${fmt(finalEBITDA)} x ${exitMultiple} = ₹ ${fmt(exitEnterpriseValue)}</td>
+        <td colspan="3"></td>
+        <td>Debt Outstanding: ₹ ${fmt(exitDebtOutstanding)}</td>
+        <td><strong>Exit Equity Proceeds: ₹ ${fmt(exitEquityValue)}</strong></td>
+      </tr>`;
+
+      html += `</tbody></table>`;
+
+      document.getElementById('scheduleArea').innerHTML = html;
+    }
+  </script>
+</body>
+</html>

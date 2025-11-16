@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Account Settings | IB Modeler</title>
+  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    .card{max-width:520px;margin:2rem auto;background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.08);padding:24px}
+    .row{margin-bottom:14px}
+    .label{display:block;font-weight:600;margin-bottom:6px}
+    .input{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px}
+    .btn{padding:12px 16px;border:none;border-radius:8px;background:#0077cc;color:#fff;cursor:pointer}
+    .muted{color:#64748b;font-size:12px;margin-top:6px}
+    .msg{margin:12px 0;padding:10px;border-radius:8px;display:none}
+    .msg.ok{display:block;background:#ecfdf5;color:#065f46;border:1px solid #10b981}
+    .msg.err{display:block;background:#fef2f2;color:#991b1b;border:1px solid #ef4444}
+    a.back{display:inline-block;margin-top:16px;color:#0077cc;text-decoration:none;font-weight:600}
+  </style>
+</head>
+<body style="font-family: Poppins, system-ui, sans-serif; background:#f8f9fa; padding: 1rem;">
+  <div class="card">
+    <h1 style="margin:0 0 10px;">Account Settings</h1>
+    <p class="muted">Update your profile details. Email must be <strong>@gmail.com</strong>.</p>
+
+    <!-- Message area (shows ?ok=1 or ?error=...) -->
+    <div id="msg" class="msg"></div>
+
+    <form id="accountForm" method="POST" action="/account">
+      <div class="row">
+        <label class="label" for="name">Full Name</label>
+        <input class="input" id="name" name="name" type="text" placeholder="Enter your name" required>
+      </div>
+
+      <div class="row">
+        <label class="label" for="email">Email</label>
+        <input class="input" id="email" name="email" type="email"
+               placeholder="you@gmail.com"
+               pattern="^[^@\\s]+@gmail\\.com$"
+               title="Only Gmail addresses are allowed (example: you@gmail.com)"
+               required>
+        <div class="muted">We only allow Gmail addresses.</div>
+      </div>
+
+      <div class="row">
+        <label class="label" for="password">New Password <span class="muted">(leave blank to keep current)</span></label>
+        <input class="input" id="password" name="password" type="password" placeholder="********">
+        <div class="muted">At least 8 characters if you change it.</div>
+      </div>
+
+      <button class="btn" type="submit">Save Changes</button>
+    </form>
+
+    <a class="back" href="dashboard.html">⬅ Back to Dashboard</a>
+  </div>
+
+  <script>
+    // Show server messages from query params
+    const params = new URLSearchParams(location.search);
+    const msgEl = document.getElementById('msg');
+    const ok = params.get('ok');
+    const err = params.get('error');
+    if (ok === '1') { msgEl.textContent = "Settings saved successfully."; msgEl.className = "msg ok"; }
+    if (err) { msgEl.textContent = err; msgEl.className = "msg err"; }
+
+    // Client-side Gmail + password checks
+    document.getElementById('accountForm').addEventListener('submit', function(e){
+      const email = document.getElementById('email').value.trim().toLowerCase();
+      const pwd = document.getElementById('password').value;
+      if (!/^[^@\s]+@gmail\.com$/.test(email)) {
+        e.preventDefault();
+        msgEl.textContent = "Only Gmail addresses are allowed (example: you@gmail.com).";
+        msgEl.className = "msg err";
+        return;
+      }
+      if (pwd && pwd.length < 8) {
+        e.preventDefault();
+        msgEl.textContent = "Password must be at least 8 characters.";
+        msgEl.className = "msg err";
+      }
+    });
+  </script>
+</body>
+</html>
